@@ -1,10 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
     float speed = 10;
+    public LayerMask collisionMask;
 
     public void SetSpeed(float newSpeed)
     {
@@ -13,6 +15,25 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
-        transform.Translate(Vector3.forward * Time.deltaTime * speed);
+        float moveDistance = speed * Time.deltaTime;
+        CheckCollisions(moveDistance);   
+        transform.Translate(Vector3.forward * moveDistance);
+    }
+
+    private void CheckCollisions(float moveDistance)
+    {
+        Ray ray = new Ray(transform.position, transform.forward);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, moveDistance, collisionMask, QueryTriggerInteraction.Collide))
+        {
+            OnHitObject(hit);
+        }
+    }
+
+    private void OnHitObject(RaycastHit hit)
+    {
+        print(hit.collider.gameObject.name);
+        GameObject.Destroy(gameObject);
     }
 }
